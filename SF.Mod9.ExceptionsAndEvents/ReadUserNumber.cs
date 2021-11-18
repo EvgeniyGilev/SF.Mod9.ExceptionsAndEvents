@@ -1,16 +1,21 @@
 ﻿using System;
 
-namespace SF.Mod9.ExceptionsAndEvents
+namespace SF.Mod9.Events
 {
     /// <summary>
     /// Класс, обрабатывающий логику ввода пользователем числа в консоль
     /// </summary>
     public class ReadUserNumber
     {
-        // делегат
+        /// <summary>
+        /// делегат обрабатывающий ввод числа
+        /// </summary>
+        /// <param name="number">Число введенное пользователем в консоли</param>
         public delegate void NumberEnteredHandler(int number);
 
-        // событие
+        /// <summary>
+        /// Событие ввода числа
+        /// </summary>
         public event NumberEnteredHandler NumberEnteredHandlerNotify;
 
         /// <summary>
@@ -18,11 +23,25 @@ namespace SF.Mod9.ExceptionsAndEvents
         /// </summary>
         public void ReadNumber()
         {
-            Console.WriteLine("Для сортировки списка введите 1 - сортировка по возрастанию, 2 - сортировка по убыванию");
+            Console.WriteLine("Для сортировки списка введите 1 - сортировка по возрастанию (от А до Я), 2 - сортировка по убыванию (от Я до А)");
             var number = Convert.ToInt32(Console.ReadLine());
 
-            if (number != 1 && number != 2) throw new FormatException();
+            // проверяем, что ввел пользовател именно 1 или 2. Если нет, выбрасываем исключение
+            if (number != 1 && number != 2)
+            {
+                throw new FormatException();
+            }
+   
+            this.NumberEntered(number);
+        }
 
+        /// <summary>
+        /// Метод для вызова события
+        /// </summary>
+        /// <param name="number">введенное пользователем число</param>
+        protected virtual void NumberEntered(int number)
+        {
+            this.NumberEnteredHandlerNotify?.Invoke(number);
         }
     }
 }
