@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace SF.Mod9.Events
 {
@@ -13,34 +14,98 @@ namespace SF.Mod9.Events
         /// <param name="args">The args.</param>
         public static void Main(string[] args)
         {
-            ReadUserNumber readUserNumber = new ReadUserNumber();
-            readUserNumber.NumberEnteredHandlerNotify += ShowNumber;
+            ReadNumberConsole readUserNumber = new ReadNumberConsole();
+            readUserNumber.NumberEnteredHandlerNotify += SortNumber;
 
             try
             {
-                readUserNumber.ReadNumber();
+                do
+                {
+                    Console.WriteLine("Ввод фамилий:");
+                    var arraySurname = GetArrayFromConsole(5);
+                    readUserNumber.ReadNumber(arraySurname);
+                    Console.WriteLine("Для выхода нажмите <Esc>, для повтора любую клавишу");
+                }
+                while (Console.ReadKey().Key != ConsoleKey.Escape);
+            }
+            catch (SurnameException e)
+            {
+                Console.WriteLine("Фамилия введена неверно! " + e.Message);
+                Console.ReadKey();
             }
             catch (FormatException e)
             {
                 Console.WriteLine("Введено некорректное значение " + e.Message);
-                throw;
+                Console.ReadKey();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Произошла ошибка, обратитесь к разработчику " + e.Message);
+                Console.ReadKey();
             }
         }
 
         /// <summary>
-        /// Вывод в консоль собщения в зависимости от числа, введенного пользователем
+        /// Сортируем массив в зависимости от введенного числа пользователем
         /// </summary>
-        /// <param name="number">число введенное пользователем</param>
-        private static void ShowNumber(int number)
+        /// <param name="number">число введенное пользователем, определяющее сортировку</param>
+        /// <param name="arraySurname">массив фамилий для сортировки</param>
+        public static void SortNumber(int number, string[] arraySurname)
         {
             switch (number)
             {
-                case 1: Console.WriteLine("Введено значение 1, сортировка от А до Я"); 
-                        break;
+                case 1:
+                    Console.WriteLine("Введено значение 1, сортировка от А до Я");
 
-                case 2: Console.WriteLine("Введено значение 2, сортировка от Я до А"); 
-                        break;
+                    // сортировка от А до Я
+                    Array.Sort(arraySurname);
+                    break;
+
+                case 2:
+                    Console.WriteLine("Введено значение 2, сортировка от Я до А");
+
+                    // сортировка от Я до А
+                    Array.Sort(arraySurname);
+                    Array.Reverse(arraySurname);
+                    break;
             }
+
+            foreach (var item in arraySurname)
+            {
+                Console.Write(item + " ");
+            }
+        }
+
+        /// <summary>
+        /// Ввод массива из 5 фамилий через консоль
+        /// </summary>
+        /// <param name="num">число элементов массива, по умолчанию 5.</param>
+        /// <returns>Возвращаем массив фамилий</returns>
+        public static string[] GetArrayFromConsole(int num = 5)
+        {
+            var result = new string[num];
+            for (var i = 0; i < result.Length; i++)
+            {
+                Console.WriteLine("Введите фамилию пользователя номер {0} с большой буквы", i + 1);
+                string surname = Console.ReadLine();
+
+                // Проверяем введенную строку, если она не подходит под регулярное выражение, то просто выдаем наше исключение
+                result[i] = CheckSurname(surname) == true ? surname : throw new SurnameException("Ошибка ввода фамилии - " + surname + " - это не фамилия!");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Проверка ввода фамилии по регулярному выражению
+        /// </summary>
+        /// <param name="surname">введенная фамилия</param>
+        /// <returns>возвращаем true или false по результату проверки</returns>
+        public static bool CheckSurname(string surname)
+        {
+            // регулярное выражение на проверку фамилии
+            Regex regex = new Regex("^[А-Я][а-я]*$");
+            return regex.IsMatch(surname);
         }
     }
 }
