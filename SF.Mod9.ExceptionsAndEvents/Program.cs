@@ -11,8 +11,7 @@ namespace SF.Mod9.Events
         /// <summary>
         /// Main code
         /// </summary>
-        /// <param name="args">The args.</param>
-        public static void Main(string[] args)
+        public static void Main()
         {
             ReadNumberConsole readUserNumber = new ReadNumberConsole();
             readUserNumber.NumberEnteredHandlerNotify += SortNumber;
@@ -22,7 +21,7 @@ namespace SF.Mod9.Events
                 do
                 {
                     Console.WriteLine("Ввод фамилий:");
-                    var arraySurname = GetArrayFromConsole(5);
+                    var arraySurname = GetArrayFromConsole();
                     readUserNumber.ReadNumber(arraySurname);
                     Console.WriteLine("Для выхода нажмите <Esc>, для повтора любую клавишу");
                 }
@@ -30,7 +29,7 @@ namespace SF.Mod9.Events
             }
             catch (SurnameException e)
             {
-                Console.WriteLine("Фамилия введена неверно! " + e.Message);
+                Console.WriteLine(e.Message);
                 Console.ReadKey();
             }
             catch (FormatException e)
@@ -89,8 +88,8 @@ namespace SF.Mod9.Events
                 Console.WriteLine("Введите фамилию пользователя номер {0} с большой буквы", i + 1);
                 string surname = Console.ReadLine();
 
-                // Проверяем введенную строку, если она не подходит под регулярное выражение, то просто выдаем наше исключение
-                result[i] = CheckSurname(surname) == true ? surname : throw new SurnameException("Ошибка ввода фамилии - " + surname + " - это не фамилия!");
+                // Проверяем введенную строку, если она не подходит под регулярное выражение, то просто грубо выдаем наше исключение
+                result[i] = CheckSurname(surname) ? surname : throw new SurnameException("Ошибка ввода фамилии - " + surname + " - это не фамилия!");
             }
 
             return result;
